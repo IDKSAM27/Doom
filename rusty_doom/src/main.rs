@@ -1,7 +1,8 @@
 use ggez::event::{self, EventHandler, KeyCode, KeyMods};
 use ggez::graphics::{self, Color};
 use ggez::{Context, ContextBuilder, GameResult};
-use std::time::Duration
+use std::time::Duration;
+use ggez::context::quit;
 
 mod settings;
 mod map;
