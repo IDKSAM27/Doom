@@ -1,64 +1,53 @@
-use std::collections::HashMap;
+use ggez::graphics::{self, Color, DrawMode, DrawParam, Mesh, MeshBuilder};
+use ggez::{Context, GameResult};
 
-use ggez::{Context, GameResult, graphics};
+const TILE_SIZE: f32 = 100.0;
 
 pub struct Map {
-    mini_map: Vec<Vec<bool>>,
-    world_map: HashMap<(usize, usize), bool>
+    world_map: Vec<(usize, usize)>,
 }
 
 impl Map {
-    pub fn new() -> Self {
-        let mini_map = vec![
-            vec![true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
-            vec![true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true],
-            vec![true, false, false, true, true, true, true, false, false, false, true, true, true, false, false, true],
-            vec![true; 16],
-            vec![true; 16],
-            vec![true; 16],
-            vec![true; 16],
-            vec![true; 16],
-            vec![true; 16],
+    pub fn new() -> Map {
+        let mini_map = [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         ];
 
-        let mut map = Map {
-            mini_map,
-            world_map: HashMap::new(),
-        };
-        map.get_map();
-        map
-    }
-
-    fn get_map(&mut self){
-        for (j, row) in self.mini_map.iter().enumerate() {
-            for (i, &value) in row.iter().enumerate() {
-                if value {
-                    self.world_map.insert((i, j), value);
+        let mut world_map = vec![];
+        for (j, row) in mini_map.iter().enumerate() {
+            for (i, &val) in row.iter().enumerate() {
+                if val == 1 {
+                    world_map.push((i, j));
                 }
             }
         }
+
+        Map { world_map }
     }
 
-    pub fn draw(&self, ctx: &mut Context) -> GameResult {
-        let tile_size = 100.0;
-        let color = graphics::Color::from_rgb(169, 169, 169); // dark gray
-
-        for &(x, y) in self.world_map.keys() {
+    pub fn draw(&self, ctx: &mut Context, canvas: &mut ggez::graphics::Canvas) -> GameResult {
+        let mut mesh_builder = MeshBuilder::new();
+        for (i, j) in &self.world_map {
             let rect = graphics::Rect::new(
-                x as f32 * tile_size,
-                y as f32 * tile_size,
-                tile_size,
-                tile_size,
+                *i as f32 * TILE_SIZE,
+                *j as f32 * TILE_SIZE,
+                TILE_SIZE,
+                TILE_SIZE,
             );
-            let mesh = graphics::Mesh::new_rectangle(
-                ctx,
-                graphics::DrawMode::stroke(2.0),
-                rect,
-                color,
-            )?;
-            graphics::draw(ctx, &mesh, graphics::DrawParam::default())?;
+            mesh_builder.rectangle(DrawMode::stroke(2.0), rect, Color::from_rgb(169, 169, 169));
         }
 
-        Ok(())?
+        let mesh_data = mesh_builder.build(); // build mesh data without context
+        let mesh = graphics::Mesh::from_data(ctx, mesh_data); // convert to drawable mesh
+        canvas.draw(&mesh, DrawParam::default());
+        Ok(())
     }
 }

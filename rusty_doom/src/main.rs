@@ -1,67 +1,58 @@
-use ggez::event::{self, EventHandler, KeyCode, KeyMods};
-use ggez::graphics::{self, Color};
+use ggez::event::{self, EventHandler};
+use ggez::graphics::{Color, Canvas};
+use ggez::input::keyboard::KeyCode;
 use ggez::{Context, ContextBuilder, GameResult};
-use std::time::Duration;
-use ggez::context::quit;
 
-mod settings;
 mod map;
 use map::Map;
 
 struct Game {
-    map:Map,
+    map: Map,
 }
 
-
 impl Game {
-    fn new(_ctx: &mut Context) -> Game {
-        let map = Map::new();
-        Game { map }
+    pub fn new(_ctx: &mut Context) -> Game {
+        Game {
+            map: Map::new(),
+        }
     }
 
-    fn new_game(&mut self) {
-        self.map = Map::new();
-    }
-
-    fn check_events(&mut self, ctx: &mut Context) {
-        // ggez handles events in update/input callbacks, not in a loop like pygame
-        // so we won't be implementing it here but use key_down_event instead
+    fn check_events(&mut self, keycode: KeyCode, ctx: &mut Context) {
+        if keycode == KeyCode::Escape {
+            ctx.request_quit();
+        }
     }
 }
 
 impl EventHandler for Game {
     fn update(&mut self, _ctx: &mut Context) -> GameResult {
-        // Typically you'd update game state here
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
-        graphics::clear(ctx, Color::BLACK);
-        self.map.draw(ctx)?;
-        graphics::present(ctx)?;
-        ggez::timer::sleep(Duration::from_secs_f64(1.0 / settings::FPS as f64));
+        let mut canvas = Canvas::from_frame(ctx, Color::BLACK);
+        self.map.draw(ctx, &mut canvas)?;
+        canvas.finish(ctx)?;
         Ok(())
     }
 
     fn key_down_event(
         &mut self,
         ctx: &mut Context,
-        keycode: KeyCode,
-        _keymodes: KeyMods,
+        input: ggez::input::keyboard::KeyInput,
         _repeat: bool,
-    ) {
-        if keycode == KeyCode::Escape {
-            ggez::event::quit(ctx);
+    ) -> GameResult {
+        if let Some(keycode) = input.keycode {
+            self.check_events(keycode, ctx);
         }
+        Ok(())
     }
 }
 
 fn main() -> GameResult {
-    let (mut ctx, event_loop) = ContextBuilder::new("game", "author")
-        .window_setup(ggez::conf::WindowSetup::default().title("ggez Game"))
-        .window_mode(
-            ggez::conf::WindowMode::default().dimensions(settings::RES.0, settings::RES.1),
-        )
+    let (mut ctx, event_loop) = ContextBuilder::new("rusty_doom", "author")
+        .window_setup(ggez::conf::WindowSetup::default().title("Rusty Doom"))
+        .window_mode(ggez::conf::WindowMode::default().dimensions(800.0, 600.0))
         .build()?;
 
     let game = Game::new(&mut ctx);
