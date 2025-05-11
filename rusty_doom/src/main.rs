@@ -1,8 +1,8 @@
 mod settings;
 mod map;
 
-use sfml::graphics::{RenderWindow, RenderTarget, Color};
-use sfml::window::{Event, Style, Key, VideoMode};
+use sfml::graphics::{RenderWindow, RenderTarget, Color, VideoMode};
+use sfml::window::{Event, Style, Key};
 use sfml::system::Clock;
 use map::Map;
 
@@ -31,6 +31,6 @@ fn main() {
         map.draw(&mut window);
         window.display();
 
-        let _elapsed = clock.restart(); // could be used to control FPS if needed
+        let _elapsed = clock.restart();
     }
 }

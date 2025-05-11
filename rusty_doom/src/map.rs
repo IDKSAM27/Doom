@@ -1,4 +1,4 @@
-use sfml::graphics::{RenderWindow, Color, RectangleShape, RenderTarget, Transformable, Shape};
+use sfml::graphics::{RenderWindow, Color, RectangleShape, RenderTarget, Transformable};
 use sfml::system::Vector2f;
 use std::collections::HashMap;
 
@@ -41,7 +41,7 @@ impl Map {
             rect.set_position(Vector2f::new(x as f32 * TILE_SIZE, y as f32 * TILE_SIZE));
             rect.set_fill_color(Color::TRANSPARENT);
             rect.set_outline_thickness(2.0);
-            rect.set_outline_color(Color::BLACK);
+            rect.set_outline_color(Color::DARK_GRAY);
             window.draw(&rect);
         }
     }
