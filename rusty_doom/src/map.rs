@@ -1,31 +1,32 @@
-use ggez::graphics::{self, Color, DrawMode, DrawParam, Mesh, MeshBuilder};
-use ggez::{Context, GameResult};
+use sfml::graphics::{RenderWindow, Color, RectangleShape, RenderTarget, Transformable, Shape};
+use sfml::system::Vector2f;
+use std::collections::HashMap;
 
 const TILE_SIZE: f32 = 100.0;
 
 pub struct Map {
-    world_map: Vec<(usize, usize)>,
+    pub world_map: HashMap<(i32, i32), i32>,
 }
 
 impl Map {
-    pub fn new() -> Map {
-        let mini_map = [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    pub fn new() -> Self {
+        let mini_map = vec![
+            vec![1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            vec![1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            vec![1,0,0,1,1,1,1,0,0,0,1,1,1,0,0,1],
+            vec![1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            vec![1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            vec![1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            vec![1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            vec![1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            vec![1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
         ];
 
-        let mut world_map = vec![];
+        let mut world_map = HashMap::new();
         for (j, row) in mini_map.iter().enumerate() {
-            for (i, &val) in row.iter().enumerate() {
-                if val == 1 {
-                    world_map.push((i, j));
+            for (i, &value) in row.iter().enumerate() {
+                if value != 0 {
+                    world_map.insert((i as i32, j as i32), value);
                 }
             }
         }
@@ -33,21 +34,15 @@ impl Map {
         Map { world_map }
     }
 
-    pub fn draw(&self, ctx: &mut Context, canvas: &mut ggez::graphics::Canvas) -> GameResult {
-        let mut mesh_builder = MeshBuilder::new();
-        for (i, j) in &self.world_map {
-            let rect = graphics::Rect::new(
-                *i as f32 * TILE_SIZE,
-                *j as f32 * TILE_SIZE,
-                TILE_SIZE,
-                TILE_SIZE,
-            );
-            mesh_builder.rectangle(DrawMode::stroke(2.0), rect, Color::from_rgb(169, 169, 169));
+    pub fn draw(&self, window: &mut RenderWindow) {
+        for (&(x, y), _) in &self.world_map {
+            let mut rect = RectangleShape::new();
+            rect.set_size(Vector2f::new(TILE_SIZE, TILE_SIZE));
+            rect.set_position(Vector2f::new(x as f32 * TILE_SIZE, y as f32 * TILE_SIZE));
+            rect.set_fill_color(Color::TRANSPARENT);
+            rect.set_outline_thickness(2.0);
+            rect.set_outline_color(Color::BLACK);
+            window.draw(&rect);
         }
-
-        let mesh_data = mesh_builder.build(); // build mesh data without context
-        let mesh = graphics::Mesh::from_data(ctx, mesh_data); // convert to drawable mesh
-        canvas.draw(&mesh, DrawParam::default());
-        Ok(())
     }
 }
