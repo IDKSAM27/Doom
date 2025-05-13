@@ -1,8 +1,8 @@
 mod settings;
 mod map;
 
-use sfml::graphics::{RenderWindow, RenderTarget, Color, VideoMode};
-use sfml::window::{Event, Style, Key};
+use sfml::graphics::{RenderWindow, RenderTarget, Color};
+use sfml::window::{Event, Style, Key, VideoMode};
 use sfml::system::Clock;
 use map::Map;
 
@@ -13,7 +13,8 @@ fn main() {
         Style::CLOSE,
         &Default::default(),
     );
-    window.set_vertical_sync_enabled(true);
+    // window.set_vertical_sync_enabled(true);
+    window.expect("REASON").set_vertical_sync_enabled(true);
 
     let mut clock = Clock::start();
     let mut map = Map::new();
