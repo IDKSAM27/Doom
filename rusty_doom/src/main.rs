@@ -1,29 +1,30 @@
-mod settings;
-mod map;
-
-use sfml::graphics::{RenderWindow, RenderTarget, Color};
-use sfml::window::{Event, Style, Key, VideoMode};
+use sfml::graphics::{Color, RenderTarget, RenderWindow, RenderWindowExt, Style};
+use sfml::window::{Event, Key};
 use sfml::system::Clock;
-use map::Map;
+
+mod map;
 
 fn main() {
     let mut window = RenderWindow::new(
-        VideoMode::new(settings::WIDTH, settings::HEIGHT, 32),
-        "Rust SFML Game",
+        (800, 600),
+        "Rusty Doom",
         Style::CLOSE,
         &Default::default(),
-    );
-    // window.set_vertical_sync_enabled(true);
-    window.expect("REASON").set_vertical_sync_enabled(true);
+    )
+    .expect("Failed to create window");
+
+    window.set_vertical_sync_enabled(true);
 
     let mut clock = Clock::start();
-    let mut map = Map::new();
+
+    let map = map::TileMap::new();
 
     while window.is_open() {
         while let Some(event) = window.poll_event() {
             match event {
-                Event::Closed |
-                Event::KeyPressed { code: Key::Escape, .. } => return,
+                Event::Closed | Event::KeyPressed { code: Key::ESCAPE, .. } => {
+                    window.close();
+                }
                 _ => {}
             }
         }
