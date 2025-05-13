@@ -23,7 +23,7 @@ fn main() {
         while let Some(event) = window.poll_event() {
             match event {
                 Event::Closed |
-                Event::KeyPressed { code: Key::ESCAPE, .. } => return,
+                Event::KeyPressed { code: Key::Escape, .. } => return,
                 _ => {}
             }
         }
